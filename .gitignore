@@ -1,0 +1,39 @@
+# .gitignore for Cybersecurity AI Assistant project
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+.env
+
+# Models and Large Files
+*.gguf
+*.bin
+*.pt
+*.pth
+cybersec-llama2-finetuned/
+cybersec-llama2-gguf/
+cybersec-llama2-lora/
+cybersec-lora.gguf
+
+# Database
+chroma_db/
+
+# Data
+data/
+raw_data/
+*.jsonl
+!CyberSec-Dataset_escaped.jsonl (if needed, but it's 344MB, so better exclude)
+CyberSec-Dataset_escaped.jsonl
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberGuard AI - Security Operations</title>
+    <meta name="description" content="CyberGuard AI — Local cybersecurity assistant powered by fine-tuned Llama-2 and RAG.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-top">
+                <div class="brand">
+                    <i class="fa-solid fa-shield-halved brand-icon"></i>
+                    <h2>CyberGuard AI</h2>
+                    <span class="badge">PRO</span>
+                </div>
+                <!-- Theme Toggle -->
+                <div class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon" id="themeIcon"></i>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <a href="#" class="nav-item active" data-panel="chat" onclick="switchPanel('chat', this)">
+                    <i class="fa-solid fa-message"></i> Threat Analysis
+                </a>
+                <a href="#" class="nav-item" data-panel="files" onclick="switchPanel('files', this)">
+                    <i class="fa-solid fa-folder-open"></i> Documents
+                    <span class="nav-badge" id="fileCountBadge" style="display:none;">0</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="history" onclick="switchPanel('history', this)">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Chat History
+                </a>
+                <a href="#" class="nav-item" data-panel="settings" onclick="switchPanel('settings', this)">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </a>
+            </div>
+
+            <div class="system-status">
+                <div class="status-indicator">
+                    <span class="dot online"></span>
+                    <span>Systems Online</span>
+                </div>
+                <div class="model-info">
+                    <p>Model: <strong>CyberSec-Llama-2</strong></p>
+                    <p>RAG DB: <strong class="text-glow">Chroma Connected</strong></p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sidebar Toggle (mobile) -->
+        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <main class="main-content">
+
+            <!-- ===== PANEL: CHAT ===== -->
+            <section class="panel active" id="panel-chat">
+                <header class="chat-header">
+                    <div>
+                        <h1>Threat Analysis & Causal Reasoning</h1>
+                        <p class="subtitle">Secure local AI reasoning utilizing your ingested security documents.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="saveCurrentChat()" title="Save Chat">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                        </button>
+                        <button class="header-btn danger" onclick="clearMessages()" title="Clear Session">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="chat-container" id="chatContainer">
+                    <div class="message ai-message genesis-message">
+                        <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                        <div class="message-content">
+                            <p>Welcome to <strong>CyberGuard AI</strong>. I am initialized and connected to your local RAG database. What security incident or concept would you like to investigate today?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <div class="input-wrapper glass-panel">
+                        <textarea id="userInput" placeholder="Describe the threat, log anomaly, or ask a cybersecurity question..." rows="1" oninput="autoResize(this)" onkeydown="checkSubmit(event)"></textarea>
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                    <p class="footer-note">AI responses are generated locally using quantized models and Retrieval-Augmented Generation.</p>
+                </div>
+            </section>
+
+            <!-- ===== PANEL: FILES ===== -->
+            <section class="panel" id="panel-files">
+                <header class="panel-header">
+                    <div>
+                        <h1><i class="fa-solid fa-folder-open"></i> Document Management</h1>
+                        <p class="subtitle">Upload, view, and manage your RAG knowledge base documents.</p>
+                    </div>
+                </header>
+
+                <div class="panel-body">
+                    <!-- Upload Zone -->
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <h3>Drag & Drop Files Here</h3>
+                        <p>or click to browse — Supports <strong>PDF</strong> and <strong>TXT</strong></p>
+                        <input type="file" id="fileInput" accept=".pdf,.txt" style="display:none;" multiple>
+                        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa-solid fa-plus"></i> Browse Files
+                        </button>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress" style="display:none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p class="progress-text" id="progressText">Uploading...</p>
+                    </div>
+
+                    <!-- Files List -->
+                    <div class="ingest-section" id="ingestSection">
+                        <button class="ingest-btn" id="ingestBtn" onclick="ingestAllDocuments()">
+                            <i class="fa-solid fa-brain"></i>
+                            <div>
+                                <strong>Process All Documents (RAG Ingestion)</strong>
+                                <span>Split, Embed & Store all files into the AI knowledge base</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="files-section">
+                        <div class="files-header">
+                            <h3><i class="fa-solid fa-database"></i> Ingested Documents</h3>
+                            <button class="refresh-btn" onclick="loadFiles()">
+                                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="files-list" id="filesList">
+                            <div class="files-empty">
+                                <i class="fa-solid fa-file-circle-question"></i>
+                                <p>No documents found. Upload some files to get started.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PANEL: CHAT HISTORY ===== -->
+            <section class="panel" id="panel-history">
+                <header class="panel-header">
+                    <div>
+                        <h1><i class="fa-solid fa-clock-rotate-left"></i> Chat History</h1>
+                        <p class="subtitle">Your saved conversations — click to restore.</p>
+                    </div>
+                    <button class="header-btn danger" onclick="clearAllHistory()">
+                        <i class="fa-solid fa-trash"></i> Clear All
+                    </button>
+                </header>
+                <div class="panel-body">
+                    <div class="history-list" id="historyList">
+                        <div class="files-empty">
+                            <i class="fa-solid fa-inbox"></i>
+                            <p>No saved chats yet. Use the save button during a chat to store it here.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PANEL: SETTINGS ===== -->
+            <section class="panel" id="panel-settings">
+                <header class="panel-header">
+                    <div>
+                        <h1><i class="fa-solid fa-gear"></i> Settings</h1>
+                        <p class="subtitle">Configure the AI model behavior and RAG parameters.</p>
+                    </div>
+                </header>
+                <div class="panel-body">
+                    <div class="settings-grid">
+                        <!-- Temperature -->
+                        <div class="setting-card glass-panel">
+                            <div class="setting-icon"><i class="fa-solid fa-temperature-half"></i></div>
+                            <div class="setting-info">
+                                <h4>Temperature</h4>
+                                <p>Controls randomness. Lower = more precise, Higher = more creative.</p>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" id="tempSlider" min="0" max="1" step="0.1" value="0.3" oninput="document.getElementById('tempValue').textContent = this.value">
+                                <span class="setting-value" id="tempValue">0.3</span>
+                            </div>
+                        </div>
+
+                        <!-- RAG Chunks -->
+                        <div class="setting-card glass-panel">
+                            <div class="setting-icon"><i class="fa-solid fa-layer-group"></i></div>
+                            <div class="setting-info">
+                                <h4>RAG Context Chunks (k)</h4>
+                                <p>Number of document chunks retrieved per query.</p>
+                            </div>
+                            <div class="setting-control">
+                                <input type="range" id="kSlider" min="1" max="10" step="1" value="3" oninput="document.getElementById('kValue').textContent = this.value">
+                                <span class="setting-value" id="kValue">3</span>
+                            </div>
+                        </div>
+
+                        <!-- Theme -->
+                        <div class="setting-card glass-panel">
+                            <div class="setting-icon"><i class="fa-solid fa-palette"></i></div>
+                            <div class="setting-info">
+                                <h4>Appearance</h4>
+                                <p>Switch between dark and light mode.</p>
+                            </div>
+                            <div class="setting-control">
+                                <button class="toggle-theme-btn" onclick="toggleTheme()">
+                                    <i class="fa-solid fa-circle-half-stroke"></i> Toggle Theme
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Save -->
+                        <div class="settings-actions">
+                            <button class="save-settings-btn" onclick="saveSettings()">
+                                <i class="fa-solid fa-floppy-disk"></i> Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
