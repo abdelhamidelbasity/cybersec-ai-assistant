@@ -1,151 +1,60 @@
-# Cybersecurity AI Assistant (RAG + Fine-Tuning)
+# 🛡️ Cybersecurity AI Assistant (RAG + Fine-Tuning)
 
-## 🎯 Project Idea
-Build an AI assistant specialized in cybersecurity.
+An advanced AI assistant specialized in cybersecurity, combining **Retrieval-Augmented Generation (RAG)** for real-time knowledge and **Fine-Tuning** for specialized behavior.
 
-- Answers questions about threats, attacks, vulnerabilities
-- Uses real documents (OWASP, CVE, logs)
-- Combines RAG for knowledge and fine-tuning for behavior
+## 🎯 Project Overview
+This project builds a specialized assistant that:
+- Answers complex questions about cybersecurity threats, attacks, and vulnerabilities.
+- Utilizes real-world documents (OWASP, CVE reports, security logs) for context.
+- Uses a fine-tuned **Llama-2-7B** model (via Unsloth) to ensure structured, professional security analysis.
 
----
+## 🧱 Architecture
+The system follows a modern RAG pipeline:
+1. **User Query**: Input via Web Interface or CLI.
+2. **Knowledge Retrieval**: ChromaDB vector database retrieves relevant chunks from security documents.
+3. **LLM Processing**: A fine-tuned Llama-2 model processes the query using the retrieved context.
+4. **Structured Output**: Response covering mechanisms, evidence, and recommendations.
 
-## 🧱 Architecture Overview
+## 🚀 Key Features
+- **Hybrid Knowledge**: Combines pre-trained wisdom with specific document-based knowledge.
+- **Fine-tuned Logic**: Specifically trained on 5,000+ cybersecurity Q&A pairs for better reasoning.
+- **Web Interface**: Clean, interactive UI for seamless communication.
+- **Multilingual Support**: Optimized for both English and Arabic cybersecurity terminology.
 
-User  
-↓  
-LLM (LLaMA)  
-↓  
-RAG System (Vector DB + Embeddings)  
-↓  
-Cybersecurity Documents  
+## 📁 Project Structure
+- `app.py`: Flask-based web application.
+- `ingest.py`: Script to process and embed documents into the vector database.
+- `rag_bot.py`: CLI-based interaction script.
+- `scripts/`: Contains fine-tuning and dataset preparation scripts.
+- `templates/` & `static/`: Frontend assets for the web UI.
 
-+ Fine-tuning (LoRA / QLoRA) to improve response style
+## 🛠️ Installation & Setup
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/cybersec-ai-assistant.git
+   cd cybersec-ai-assistant
+   ```
 
----
+2. **Set up Virtual Environment**:
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-## ⚙️ Phase 1: Problem Definition
+3. **Install Ollama**:
+   Ensure [Ollama](https://ollama.com/) is installed and running.
 
-- Define use case:
-  - SOC assistant
-  - Student helper
-- Define input:
-  - Questions, logs
-- Define output:
-  - Explanation, detection, steps
+4. **Prepare the Model**:
+   Follow the [TRAINING_GUIDE.md](TRAINING_GUIDE.md) to fine-tune and export the model to GGUF format.
 
----
+## 📖 Usage
+- **Ingest Documents**: Place PDF/TXT files in `/data` and run `python ingest.py`.
+- **Start Web App**: Run `python app.py` and visit `http://127.0.0.1:5000`.
+- **CLI Mode**: Run `python rag_bot.py` for direct terminal chat.
 
-## 📚 Phase 2: Data Collection
-
-Sources:
-- OWASP documentation  
-- CVE reports  
-- Security blogs  
-- Logs (optional)
-
-Optional datasets:
-- Kaggle (fraud, security data)
-
-Output:
-- Clean documents (PDF, TXT)
-
----
-
-## 🔎 Phase 3: RAG Setup
-
-Tools:
-- Ollama (run LLaMA locally)
-- Embeddings model
-- Vector database
-
-Steps:
-1. Split documents (chunking)
-2. Convert to embeddings
-3. Store in vector DB
-4. Query relevant chunks
-5. Send context to LLM
-
-Output:
-- System answers using your docs
+## ⚖️ License
+This project is for educational and research purposes in cybersecurity.
 
 ---
-
-## 📊 Phase 4: Evaluation
-
-- Prepare test questions
-- Check:
-  - Accuracy
-  - Relevance
-  - Context usage
-
-If weak:
-- Improve data or chunking
-
----
-
-## 🧠 Phase 5: Fine-Tuning
-
-Tool:
-- Unsloth
-
-Technique:
-- LoRA / QLoRA
-
-Dataset:
-- Small, clean Q&A (cybersecurity)
-
-Goal:
-- Improve style
-- Better structured answers
-- Add reasoning steps
-
----
-
-## 🔗 Phase 6: Integration
-
-Combine:
-- LLaMA (fine-tuned)
-- RAG system
-- Documents
-
-Final flow:
-User → LLM → RAG → Docs → Answer
-
----
-
-## 🖥️ Phase 7: Interface
-
-- CLI or simple web app
-- User inputs question
-- Displays answer
-
----
-
-## 📈 Phase 8: Final Evaluation
-
-Compare:
-- Before fine-tuning
-- After fine-tuning
-
-Metrics:
-- Answer quality
-- Precision
-- Clarity
-
----
-
-## 🏁 Key Insight
-
-- RAG = knowledge  
-- Fine-tuning = behavior  
-
-Do not confuse them.
-
----
-
-## 🚀 Final Goal
-
-A practical AI assistant that:
-- Understands cybersecurity context
-- Uses real data
-- Gives structured, useful answers
+© 2026 Cybersecurity AI Assistant Project
