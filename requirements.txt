@@ -1,7 +1,0 @@
-flask
-langchain-community
-langchain-ollama
-langchain-text-splitters
-pypdf
-chromadb
-werkzeug
