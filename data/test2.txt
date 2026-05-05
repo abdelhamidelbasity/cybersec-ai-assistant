@@ -1,0 +1,38 @@
+SQL injection (SQLi) is essentially the digital equivalent of someone sneaking an "and also give me the keys to the vault" clause into a contract right as you’re signing it. It happens when an attacker inserts malicious SQL code into a query, tricking your database into doing something it shouldn't—like dumping your entire user table or bypassing a login.
+
+The good news? It’s a solved problem. If you follow these "Golden Rules," you’ll keep your data under lock and key.
+
+1. The Gold Standard: Prepared Statements
+Also known as parameterized queries, this is your #1 defense. Instead of building a query string with user input, you use "placeholders." The database is told the structure of the query beforehand, and the user input is treated strictly as data, never as executable code.
+
+The Wrong Way (Vulnerable):
+
+SQL
+-- An attacker could enter "' OR '1'='1" as the username
+"SELECT * FROM users WHERE username = '" + userInput + "';"
+The Right Way (Secure):
+
+SQL
+-- The database treats the input as a single literal string
+"SELECT * FROM users WHERE username = ?;"
+2. Use Stored Procedures
+Stored procedures can prevent SQLi similarly to prepared statements, provided they are written correctly. They require the developer to define the query first and then pass parameters. However, be careful: if the stored procedure itself uses string concatenation internally, you're back to square one.
+
+3. Input Validation (Allow-listing)
+Don't just check for "bad" characters; check for "good" ones. This is known as allow-listing.
+
+If you expect a phone number, only allow digits.
+
+If you expect a US Zip code, only allow 5 digits.
+
+If you have a dropdown for "Sort By," only allow values like date_created or price.
+
+4. The Principle of Least Privilege
+Don't give your web application's database account "Root" or "Admin" access.
+
+Read-only accounts: Use these for parts of the site that only display data.
+
+Specific permissions: Your app should only have permission to SELECT, INSERT, and UPDATE specific tables. It should never have permission to DROP TABLE.
+
+5. Use a Web Application Firewall (WAF)
+A WAF acts as a first line of defense. It sits in front of your application and looks for common SQLi patterns (like OR 1=1 or --) in the incoming traffic. While it’s not a replacement for secure coding, it provides a great safety net for known signatures.
